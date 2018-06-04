@@ -1,0 +1,49 @@
+<html>
+<head>
+	<title>Our Grocery List</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>	
+</head>
+<body>
+	<div class="container">
+			<h2>Node.js + Socket Demo</h2>
+            <h3>This text can be sharable among your team in a LAN and they can add text and share it with you too</h3>
+            <h4>Add Text : </h4>
+    		<input type="text" size="50" placeholder="Enter Item" id="itemBox" class="form-control"><br>
+			<button id="addItemBtn" class="btn btn-success"> Add </button><br><br>
+			<div id="listOfItems"></div>
+	</div>
+	<script type="text/javascript">
+		var socketIo = io();
+
+		socketIo.on('broadcast', addItem);
+
+		$(() => {
+			getAllItems();
+			$("#addItemBtn").click(() => {
+				//addItem({"item": $("#itemBox").val()});
+				var theItem = {"item":$("#itemBox").val()};
+				postItem(theItem);
+			});
+		});
+
+		function addItem(itemToAdd){
+			console.log(itemToAdd);
+			$("#listOfItems").prepend("<h4>"+ itemToAdd.item +"</h4>");
+			$("#itemBox").val('');
+		}
+
+		function getAllItems(){
+			$.get("http://localhost:3000/items", (data) => {
+				data.forEach(addItem);
+			})
+		}
+
+		function postItem(theItem){
+			$.post("http://localhost:3000/items", theItem);
+		}
+
+	</script>
+</body>
+</html>
